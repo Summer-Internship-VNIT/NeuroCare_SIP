@@ -1,0 +1,130 @@
+{% extends 'layout.html' %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="dashboard-container">
+
+  <!-- Admin Welcome -->
+  <div class="card info-card">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <h2>Welcome, Admin!</h2>
+        <p>This dashboard displays trends and statistics from the TBM dataset.</p>
+      </div>
+      <div>
+        <a href="{{ url_for('admin_dashboard') }}" style="padding: 10px 16px; background: #007bff; color: white; border-radius: 4px; text-decoration: none;">View Records</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stat Cards -->
+  <div class="card-grid">
+    <div class="card stat-card">
+      <h4>Total Records</h4>
+      <p>{{ total_records }}</p>
+    </div>
+    <div class="card stat-card">
+      <h4>Total Unique Patients</h4>
+      <p>{{ total_patients }}</p>
+    </div>
+
+    <div style="background-color: #c2edea; padding: 20px; border-radius: 15px; margin: 10px; flex: 1;">
+  <form action="{{ url_for('admin_generate_report') }}" method="post" style="display: flex; flex-direction: column; align-items: center;">
+    <label for="admin_pid" style="font-weight: bold; color: #007bff; margin-bottom: 10px;">Generate Patient Report</label>
+    <input type="text" id="admin_pid" name="patient_id" placeholder="Enter Patient ID"
+           style="padding: 8px; border-radius: 5px; border: 1px solid #ccc; margin-bottom: 10px; width: 100%;">
+    <button type="submit"
+            style="background-color: #007bff; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer;">
+      Generate
+    </button>
+  </form>
+</div>
+  
+</div>
+
+  <!-- Charts -->
+  <div class="charts-container">
+    <!-- Diagnosis Distribution -->
+    <div class="card chart-card">
+      <h3>Diagnosis Distribution</h3>
+      <canvas id="diagnosisChart"></canvas>
+    </div>
+
+    <!-- TBM Score Distribution -->
+    <div class="card chart-card">
+      <h3>TBM Score Distribution (Abnormal Cases)</h3>
+      <canvas id="tbmScoreChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Chart Script -->
+<script>
+  const predSummary = JSON.parse(`{{ pred_summary | tojson | safe }}`);
+  const tbmScores = JSON.parse(`{{ tbm_score_dist | tojson | safe }}`);
+
+  // Diagnosis Pie Chart
+  new Chart(document.getElementById('diagnosisChart'), {
+    type: 'pie',
+    data: {
+      labels: Object.keys(predSummary),
+      datasets: [{
+        data: Object.values(predSummary),
+        backgroundColor: ['#36A2EB', '#FF6384', '#FFCE56'],
+        hoverOffset: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Diagnosis Summary'
+        },
+        legend: {
+          position: 'bottom'
+        }
+      }
+    }
+  });
+
+  // TBM Score Bar Chart
+  new Chart(document.getElementById('tbmScoreChart'), {
+    type: 'bar',
+    data: {
+      labels: Object.keys(tbmScores),
+      datasets: [{
+        label: 'Patients',
+        data: Object.values(tbmScores),
+        backgroundColor: '#8e44ad'
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'TBM Score Distribution'
+        },
+        legend: { display: false }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Count'
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'TBM Score'
+          }
+        }
+      }
+    }
+  });
+</script>
+{% endblock %}

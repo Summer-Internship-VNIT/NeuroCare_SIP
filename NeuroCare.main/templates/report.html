@@ -1,0 +1,167 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/report.css') }}">
+
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f2f5f9;
+    margin: 0;
+    padding: 0;
+  }
+
+  .report-container {
+    max-width: 900px;
+    margin: 50px auto;
+    padding: 40px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  }
+
+  .report-container h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #007bff;
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  .report-card p {
+    font-size: 17px;
+    margin: 12px 0;
+    line-height: 1.5;
+  }
+
+  .highlight-box {
+    margin-top: 30px;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #fff4e5;
+    border-left: 6px solid #ffa500;
+  }
+
+  .highlight-box.green {
+    background-color: #e0f7ea;
+    border-left-color: #28a745;
+  }
+
+  .highlight-box h4 {
+    margin-top: 0;
+    font-size: 18px;
+    color: #333;
+  }
+
+  .top-links {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+  }
+
+  .top-links a {
+    background: #007bff;
+    color: white;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  .top-links a:hover {
+    background-color: #0056b3;
+  }
+
+  .download-btn-container {
+    text-align: center;
+    margin-top: 40px;
+  }
+
+  .download-btn-container a {
+    background: #28a745;
+    padding: 12px 25px;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background 0.3s ease;
+  }
+
+  .download-btn-container a:hover {
+    background-color: #1e7e34;
+  }
+  .diagnosis-abnormal {
+    color: red;
+  }
+  .diagnosis-normal {
+    color: green;
+  }
+</style>
+
+<div class="report-container">
+  <!-- Top Right Dashboard Button -->
+  <div class="top-links">
+    <a href="{{ url_for('dashboard') }}">← Back to Dashboard</a>
+  </div>
+
+  <h2>Patient Report</h2>
+
+  {% if record %}
+    <div class="report-card">
+      <p><strong>Patient ID:</strong> {{ record['Patient_ID'] }}</p>
+      <p><strong>Date:</strong> {{ record['Date'] }}</p>
+      <p><strong>Sample Code:</strong> {{ record['Sample Code'] }}</p>
+        <span class="{% if record['Diagnosis'] == 'Abnormal' %}diagnosis-abnormal{% else %}diagnosis-normal{% endif %}">
+          {{ record['Diagnosis'] }}
+        </span>
+      <p><strong>Sugar:</strong> {{ record['Sugar'] }}</p>
+      <p><strong>Protein:</strong> {{ record['Protein'] }}</p>
+      <p><strong>Diagnosis:</strong>
+        <span class="{% if record['Diagnosis'] == 'Abnormal' %}diagnosis-abnormal{% else %}diagnosis-normal{% endif %}">
+          {{ record['Diagnosis'] }}
+        </span>
+      </p>
+      <p><strong>TBM Score:</strong> {{ record['TBM Score'] }}</p>
+    </div>
+
+    {% if record['Diagnosis'] == 'Abnormal' %}
+      <div class="highlight-box">
+        <h4>🧠 Clinical Interpretation Based on TBM Score:</h4>
+        <p>
+          {% if record['TBM Score'] == 0 %}
+            Although the AI system detected abnormality, the TBM score is <strong>0</strong>, indicating no evidence of TBM based on lab values. Please correlate clinically.
+          {% elif record['TBM Score'] == 2.5 %}
+            A <strong>low TBM score of 2.5</strong> suggests minimal deviation in CSF parameters. TBM cannot be confirmed, but continued observation and clinical judgment are advised.
+          {% elif record['TBM Score'] == 5 %}
+            A <strong>moderate score of 5</strong> indicates a possible TBM case. The CSF profile raises suspicion. Further diagnostic evaluation is recommended.
+          {% elif record['TBM Score'] == 7.5 %}
+            A <strong>score of 7.5</strong> is suggestive of probable TBM. Immediate medical attention and imaging/lab correlation is strongly advised.
+          {% elif record['TBM Score'] == 10 %}
+            The TBM Score of <strong>10</strong> indicates a strong likelihood of Tuberculous Meningitis. Clinical management should be initiated urgently.
+          {% else %}
+            TBM Score is outside standard thresholds. Please consult a medical expert for interpretation.
+          {% endif %}
+        </p>
+      </div>
+    {% else %}
+      <div class="highlight-box green">
+        <h4>🟢 Diagnosis: Normal</h4>
+        <p>The current CSF analysis shows no signs of Tuberculous Meningitis. Continue routine follow-ups and clinical observation.</p>
+      </div>
+    {% endif %}
+
+  {% else %}
+    <p>No record found.</p>
+  {% endif %}
+
+  <!-- Bottom Centered Download Button -->
+  <div class="download-btn-container">
+    <a href="{{ url_for('download_report_pdf') }}">⬇️ Download Report PDF</a>
+  </div>
+</div>
+
+{% endblock %}

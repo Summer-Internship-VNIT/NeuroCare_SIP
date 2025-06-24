@@ -1,0 +1,53 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
+
+<div class="admin-dashboard-container">
+  <h2>Patient Records</h2>
+
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Search by ID, Name, Sample Code, or Condition (Normal/Abnormal)...">
+  </div>
+
+  <div class="table-container">
+    <table id="adminTable">
+      <thead>
+        <tr>
+          {% for col in data[0].keys() %}
+            <th>{{ col }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in data %}
+          <tr>
+            {% for val in row.values() %}
+              <td>{{ val }}</td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Search filter script -->
+<script>
+  document.getElementById("searchInput").addEventListener("input", function () {
+    const value = this.value.toLowerCase().trim();
+    const searchTerms = value.split(/\s+/);  // Split by spaces
+    const rows = document.querySelectorAll("#adminTable tbody tr");
+
+    rows.forEach(row => {
+      const rowText = row.textContent.toLowerCase();
+      const words = rowText.split(/\s+/);
+      const matches = searchTerms.every(term =>
+        words.some(word => word === term)
+      );
+      row.style.display = matches ? "" : "none";
+    });
+  });
+</script>
+
+{% endblock %}

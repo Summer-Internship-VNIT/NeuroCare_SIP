@@ -1,0 +1,107 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #ffffff;
+  margin: 0;
+  padding: 0;
+}
+
+.dashboard-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.card {
+  background: #b3e6e0;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.info-card h2 {
+  margin-top: 0;
+  color: #2c3e50;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.stat-card {
+  text-align: center;
+  border: 1px solid #eee;
+}
+
+.chart-card canvas {
+  max-width: 100%;
+  height: 300px;
+}
+
+.charts-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.table-card input {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  border: 1px solid #9cc4d0;
+}
+
+.table-scroll {
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: auto;
+  border: 1px solid #ddd;
+}
+
+.table-scroll table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-scroll th, .table-scroll td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #18414e;
+}
+
+.table-scroll thead th {
+  position: sticky;
+  top: 0;
+  background-color: #18414e; /* Blue */
+  color: rgb(255, 255, 255);
+  z-index: 2;
+}
+
+
+.table-scroll tr:hover {
+  background-color: #9cc4d0;
+}
+
+.card-grid {
+  display: flex;
+  flex-wrap: nowrap;  /* 🚫 Don't wrap */
+  justify-content: space-between;
+  gap: 15px; /* Optional */
+}
+
+.card.stat-card {
+  width: 20%;
+  background-color: #b2dfdb;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  min-height: 120px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}

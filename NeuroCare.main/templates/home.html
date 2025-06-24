@@ -1,0 +1,110 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Neurocare{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style1.css') }}">
+    {% block head %}{% endblock %}
+</head>
+
+<header>
+  <div class="container nav">
+    <div class="logo">Neurocare</div>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="#about-section">About</a></li>
+                <li><a href="#footer">Contact</a></li>
+                <li><a href="{{ url_for('blog') }}">Blog</a></li>
+                <li><a href="{{ url_for('login') }}">Log in</a></li>
+                <li><a href="{{ url_for('signup') }}">Sign up</a></li>
+            </ul>
+        </nav>
+    
+  </div>
+</header>
+
+<script>
+  function redirectWithDelay() {
+    document.querySelector('.btn-primary').innerText = "Loading...";
+    setTimeout(function () {
+      window.location.href = "{{ url_for('login') }}";
+    }, 2000);
+  }
+</script>
+
+<section class="hero">
+  <div class="container hero-content">
+    <div class="hero-text">
+      <h5>WELCOME TO NEUROCARE</h5>
+      <h1>Taking care of your health is our top priority.</h1>
+      <p>
+AI-Powered Insight, At Neurocare, we harness the power of artificial intelligence to assist healthcare professionals in identifying TBM faster and more accurately
+      </p>
+      <a href="{{ url_for('signup') }}" class="btn-secondary">CHECK TBM</a>
+    </div>
+    <div class="hero-image">
+      <img src="{{ url_for('static', filename='images/robodoc4.png') }}" alt="Doctor Image">
+    </div>
+  </div>
+</section>
+
+<section class="features">
+  <div class="container feature-boxes">
+    <div class="feature">
+      <img src="{{ url_for('static', filename='images/icon6.jpeg') }}" alt="Qualified icon">
+      <h4>Reports</h4>
+      <p>
+        Easily upload CSF lab results in supported formats. Our platform ensures complete privacy 
+        while delivering instant AI-based predictions on TBM risk.
+      </p>
+    </div>
+    <div class="feature">
+      <img src="{{ url_for('static', filename='images/icon8.png') }}" alt="Emergency Helicopter Icon">
+      <h4>Focused on TBM</h4>
+      <p>The air ambulance feature is now available even to middle class people, saving lives.</p>
+    </div>
+    <div class="feature">
+      <img src="{{ url_for('static', filename='images/icon5.png') }}" alt="Covid Icon">
+      <h4>Safe & Confidential</h4>
+      <p>We follow strict data privacy practices. All reports and health information you upload 
+        are encrypted and never shared — ensuring full confidentiality.</p>
+    </div>
+  </div>
+</section>
+
+<section class="about-section" id="about-section">
+  <div class="about-container">
+    <div class="about-text">
+      <h5 class="section-label">About Us</h5>
+      <h2>Welcome To CIIMS Central Hospital</h2>
+      <p>CIIMS Neuro Hospital is a leading multi-specialty institute specializing in advanced neurology and neurosurgery</p>
+      <ul class="about-list">
+        <li>✔ Years of excellence</li>
+        <li>✔ A Multispecialty hospital</li>
+        <li>✔ 24/7 Hour Medical Service</li>
+        <li>✔ A team of researchers</li>
+      </ul>
+      <!-- <a href="{{ url_for('signup') }}" class="btn-primary">Book An Appointment</a> -->
+    </div>
+    <div class="about-image-wrapper">
+      <img src="{{ url_for('static', filename='images/maledoc2.png') }}" alt="about image" class="about-image">
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer" id="footer">
+  <div class="footer-container">
+    <div class="footer-logo">Neurocare</div>
+    <p>&copy; CIIMS Hospital. All rights reserved.</p>
+    <div class="footer-links">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms</a>
+      <a href="#">Contact</a>
+    </div>
+  </div>
+</footer>
+
+
+{% endblock %}

@@ -1,0 +1,170 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/report.css') }}">
+
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f2f5f9;
+    margin: 0;
+    padding: 0;
+  }
+
+  .report-container {
+    max-width: 900px;
+    margin: 50px auto;
+    padding: 40px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  }
+
+  .report-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #007bff;
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  .report-card {
+    border: 1px solid #e0e0e0;
+    border-left: 6px solid #007bff;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 25px;
+    background-color: #f9fcff;
+  }
+
+  .report-card p {
+    font-size: 16px;
+    margin: 10px 0;
+    line-height: 1.5;
+  }
+
+  .highlight-box {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #fff4e5;
+    border-left: 6px solid #ffa500;
+  }
+
+  .highlight-box.green {
+    background-color: #e0f7ea;
+    border-left-color: #28a745;
+  }
+
+  .highlight-box h4 {
+    margin-top: 0;
+    font-size: 16px;
+    color: #333;
+  }
+
+  .top-links {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+  }
+
+  .top-links a {
+    background: #007bff;
+    color: white;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  .top-links a:hover {
+    background-color: #0056b3;
+  }
+
+  .download-btn-container {
+    text-align: center;
+    margin-top: 40px;
+  }
+
+  .download-btn-container a {
+    background: #28a745;
+    padding: 12px 25px;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background 0.3s ease;
+  }
+
+  .download-btn-container a:hover {
+    background-color: #1e7e34;
+  }
+</style>
+
+<div class="report-container">
+  <div class="top-links">
+    <a href="{{ url_for('dashboard') }}">← Back to Dashboard</a>
+  </div>
+
+  <h2>Patient Report</h2>
+  <h4 style="text-align:center;">Patient ID: {{ patient_id }}</h4>
+
+  {% if records %}
+    {% for record in records %}
+      <div class="report-card">
+        <p><strong>Date:</strong> {{ record['Date'] }}</p>
+        <p><strong>Sample Code:</strong> {{ record['Sample Code'] }}</p>
+        <p><strong>TLC:</strong> {{ record['TLC'] }}</p>
+        <p><strong>Lymphocytes (L%):</strong> {{ record['L%'] }}</p>
+        <p><strong>Polymorphs (P%):</strong> {{ record['P%'] }}</p>
+        <p><strong>Sugar:</strong> {{ record['Sugar'] }}</p>
+        <p><strong>Protein:</strong> {{ record['Protein'] }}</p>
+        <p><strong>Diagnosis:</strong>
+          <span style="color: '{{ 'red' if record['Diagnosis'] == 'Abnormal' else 'green' }}'">
+            {{ record['Diagnosis'] }}
+          </span>
+        </p>
+        <p><strong>TBM Score:</strong> {{ record['TBM Score'] }}</p>
+
+        {% if record['Diagnosis'] == 'Abnormal' %}
+          <div class="highlight-box">
+            <h4>🧠 Interpretation:</h4>
+            <p>
+              {% if record['TBM Score'] == 0 %}
+                TBM score is <strong>0</strong>, indicating no lab evidence of TBM. Clinical correlation recommended.
+              {% elif record['TBM Score'] == 2.5 %}
+                A <strong>low score</strong> of 2.5 — mild deviation in CSF. TBM not confirmed but observation advised.
+              {% elif record['TBM Score'] == 5 %}
+                <strong>Moderate score</strong> (5) — raises TBM suspicion. Diagnostic evaluation needed.
+              {% elif record['TBM Score'] == 7.5 %}
+                Score <strong>7.5</strong> indicates probable TBM. Immediate clinical action required.
+              {% elif record['TBM Score'] == 10 %}
+                TBM Score <strong>10</strong> — strong indication of Tuberculous Meningitis. Act urgently.
+              {% else %}
+                TBM Score unusual. Please consult a clinical expert.
+              {% endif %}
+            </p>
+          </div>
+        {% else %}
+          <div class="highlight-box green">
+            <h4>🟢 Diagnosis: Normal</h4>
+            <p>No signs of Tuberculous Meningitis in this record. Regular follow-up advised.</p>
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    <!-- Download Button -->
+    <div class="download-btn-container">
+      <a href="{{ url_for('admin_download_report_pdf', patient_id=patient_id) }}" target="_blank">⬇️ Download Full PDF</a>
+    </div>
+  {% else %}
+    <p>No records found for this patient.</p>
+  {% endif %}
+</div>
+
+{% endblock %}
