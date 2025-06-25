@@ -32,6 +32,8 @@ model = joblib.load(model_path)
 # --------------------------------------------------------------------------- #
 #  ROUTES
 # --------------------------------------------------------------------------- #
+
+
 def init_routes(app):
     # ─────────────────────────── HOME ─────────────────────────── #
     @app.route("/home")
@@ -100,93 +102,104 @@ def init_routes(app):
 
 
         return render_template("signup.html")
+    
+     # ───────────────────── BLOG ───────────────────── # 
+    @app.route('/blog')
+    def blog():
+        return render_template('blog.html')
 
 
-    # ───────────── DATA-ENTRY (CSF) ───────────── #
+ # ───────────── DATA-ENTRY (CSF) ───────────── #
     @app.route("/data_entry", methods=["GET", "POST"])
     def data_entry():
-        if "username" not in session or session.get("role") != "Client":
-            print("❌ Unauthorized access.")
+        if "username" not in session or session["role"] != "Client":
             return redirect(url_for("login"))
 
         if request.method == "POST":
-            try:
-                print("📥 Received form:", dict(request.form))
-                print("🔑 Session:", session)
-                print("📄 Saving to:", TBM_DATA_CSV)
+            cols = [
+                "Sr No.", "Date", "Sample Code", "Patient_ID",
+                "TLC", "L%", "P%", "Sugar", "Protein",
+                "Diagnosis", "TBM Score"
+            ]
 
-                # Full expected columns, including optional ones
-                columns = [
-                    "Sr No.", "Date", "Sample Code", "Patient_ID",
-                    "TLC", "L%", "P%", "Sugar", "Protein",
-                    "Diagnosis", "TBM Score"
-                ]
+            # Load existing data or create new DataFrame
+            df = (
+                pd.read_csv(TBM_DATA_CSV)
+                if os.path.exists(TBM_DATA_CSV) else pd.DataFrame(columns=cols)
+            )
 
-                # Ensure folder exists
-                os.makedirs(os.path.dirname(TBM_DATA_CSV), exist_ok=True)
+            # Prepare new row input
+            next_sr = len(df) + 1
+            patient_id = session["patient_id"]
+            new_row = {
+                "Sr No.": next_sr,
+                "Date": request.form["date"],
+                "Sample Code": request.form["sample_code"],
+                "Patient_ID": patient_id,
+                "TLC": float(request.form["tlc"]),
+                "L%": float(request.form["l_percent"]),
+                "P%": float(request.form["p_percent"]),
+                "Sugar": float(request.form["sugar"]),
+                "Protein": float(request.form["protein"])
+            }
 
-                # Load or initialize DataFrame
-                if os.path.exists(TBM_DATA_CSV):
-                    df = pd.read_csv(TBM_DATA_CSV)
-                    # Ensure all columns exist
-                    for col in columns:
-                        if col not in df.columns:
-                            df[col] = ""
-                else:
-                    df = pd.DataFrame(columns=columns)
+            # 🔍 Predict Diagnosis & TBM Score
+            prediction = predict_condition(new_row)
+            new_row["Diagnosis"] = prediction.get("condition", "N/A")
+            new_row["TBM Score"] = prediction.get("tbm_score", "N/A")
 
-                # New row entry
-                next_sr = len(df) + 1
-                new_row = {
-                    "Sr No.": next_sr,
-                    "Date": request.form["date"],
-                    "Sample Code": request.form["sample_code"],
-                    "Patient_ID": session.get("patient_id", "UNKNOWN"),
-                    "TLC": request.form["tlc"],
-                    "L%": request.form["l_percent"],
-                    "P%": request.form["p_percent"],
-                    "Sugar": request.form["sugar"],
-                    "Protein": request.form["protein"],
-                    "Diagnosis": "",
-                    "TBM Score": ""
-                }
+            # Append and save
+            df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+            df.to_csv(TBM_DATA_CSV, index=False)
 
-                print("➕ Adding new row:", new_row)
-
-                # Add to DataFrame
-                df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
-                df.to_csv(TBM_DATA_CSV, index=False)
-                print("✅ CSV updated successfully!")
-
-                return redirect(url_for("dashboard"))
-
-            except Exception as e:
-                print("❌ Exception while saving:", e)
+            return redirect(url_for("dashboard"))
 
         return render_template("data_entry.html")
+    
+     # ───────────────────── CLIENT DASHBOARD ───────────────────── #
+    @app.route("/dashboard")
+    def dashboard():
+        if "username" not in session:
+            return redirect(url_for("login"))
 
+        role = session["role"]
+        lab_df = load_patient_data()
 
+        if role == "Admin":
+            return render_template(
+                "admin_dashboard.html",
+                data=lab_df.to_dict(orient="records")
+            )
 
-    # ───────────────────── DASHBOARD ───────────────────── #
-    # @app.route("/dashboard")
-    # def dashboard():
-    #     if "username" not in session:
-    #         return redirect(url_for("login"))
+        # Client dashboard
+        pid = session["patient_id"]
+        lab_rows = get_patient_data_by_id(lab_df, pid).to_dict(orient="records")
 
-    #     role   = session["role"]
-    #     lab_df = load_patient_data()
+        # Final prediction for latest test
+        if lab_rows:
+            latest = lab_rows[-1]
+            prediction = predict_condition(latest)
+            diagnosis_label = prediction.get("condition", "N/A")
+            model_output_percentage = prediction.get("tbm_score", "N/A")
 
-    #     if role == "Admin":
-    #         return render_template(
-    #             "admin_dashboard.html",
-    #             data=lab_df.to_dict(orient="records")
-    #         )
+            # Interpret message based on score
+            diagnosis_message = interpret_tbm_score(model_output_percentage)
+        else:
+            diagnosis_label = ""
+            model_output_percentage = ""
+            diagnosis_message = ""
 
-    #     # Client dashboard
-    #     pid      = session["patient_id"]
-    #     lab_rows = get_patient_data_by_id(lab_df, pid).to_dict(orient="records")
+        return render_template(
+            "client_dashboard.html",
+            data=lab_rows,
+            diagnosis_label=diagnosis_label,
+            model_output_percentage=model_output_percentage,
+            diagnosis_message=diagnosis_message
+        )
+    
+    
 
-    #     return render_template("client_dashboard.html", data=lab_rows)
+      # ───────────────────── ADMIN DASHBOARD ───────────────────── #
 
     @app.route('/admin/dashboard')
     def admin_dashboard():
@@ -200,6 +213,9 @@ def init_routes(app):
         data = df.to_dict(orient="records")  # Convert to list of dicts for template
 
         return render_template('admin_dashboard.html', data=data)
+    
+    
+    
     
     # ───────────────────── ADMIN_REPORT ───────────────────── # 
     @app.route('/admin_generate_report', methods=['POST'])
@@ -221,123 +237,64 @@ def init_routes(app):
 
         return render_template("admin_report.html", records=patient_data.to_dict(orient='records'), patient_id=patient_id)
 
-    # ───────────────────── BLOG ───────────────────── # 
-    @app.route('/blog')
-    def blog():
-        return render_template('blog.html')
-
-    # ───────────────────── RECORDS ───────────────────── # 
-    @app.route("/dashboard")
-    def dashboard():
-        if "username" not in session:
-            return redirect(url_for("login"))
-
-        role = session["role"]
-        data = load_patient_data()
-
-        # ─── Admin Dashboard ───
-        # if role == "Admin":
-        #     return render_template("admin_dashboard.html", data=data.to_dict(orient="records"))
-        
-         # ─── Admin Dashboard ───
-        if role == "Admin":
-            try:
-                df = pd.read_csv(TBM_DATA_CSV)
-            except FileNotFoundError:
-                return "TBM data file not found", 404
-
-            # Drop incomplete records for accurate stats
-            df = df.dropna(subset=['Patient_ID', 'Diagnosis'])
-
-            # Basic stats
-            total_records = len(df)
-            total_patients = df['Patient_ID'].nunique()
-            diagnosis_counts = df['Diagnosis'].value_counts().to_dict()
-
-            # TBM Score Distribution (only for abnormal cases)
-            tbm_df = df[df['Diagnosis'] == 'Abnormal'].dropna(subset=['TBM Score'])
-            tbm_score_dist = (
-                tbm_df['TBM Score']
-                .astype(str)
-                .value_counts()
-                .sort_index()
-                .to_dict()
-            )
-
-            return render_template(
-                "admin_ui.html",
-                total_records=total_records,
-                total_patients=total_patients,
-                pred_summary=diagnosis_counts,
-                tbm_score_dist=tbm_score_dist
-            )
-
-        # ─── Client Dashboard ───
-        pid = session["patient_id"]
-        patient_df = get_patient_data_by_id(data, pid)
-
-        # ✅ Sort records by Date (latest last)
-        if not patient_df.empty:
-            patient_df["Date"] = pd.to_datetime(patient_df["Date"], errors='coerce')
-            patient_df = patient_df.dropna(subset=["Date"])
-            patient_df = patient_df.sort_values(by="Date")
-
-        lab_rows = patient_df.to_dict(orient="records")
-        prediction = {}
-        updated = False
-
-        # ✅ Add Diagnosis & TBM Score if not already present
-        for i, row in enumerate(lab_rows):
-            pred_result = predict_condition(row)
-            if "Diagnosis" not in row or "TBM Score" not in row \
-                or row.get("Diagnosis") != pred_result.get("condition") \
-                or row.get("TBM Score") != pred_result.get("tbm_score"):
-                row["Diagnosis"] = pred_result.get("condition", "N/A")
-                row["TBM Score"] = pred_result.get("tbm_score", "N/A")
-                updated = True
-
-        # ✅ Save updated rows to CSV only if changes were made
-        if updated:
-            updated_df = pd.DataFrame(lab_rows)
-            full_data = load_patient_data()
-
-            # Remove old rows for this patient, replace with updated
-            full_data = full_data[full_data["Patient_ID"] != pid]
-            full_data = pd.concat([full_data, updated_df], ignore_index=True)
-            full_data.to_csv(TBM_DATA_CSV, index=False)
-
-        # ✅ Final prediction for latest test
-        if lab_rows:
-            prediction = predict_condition(lab_rows[-1])
-
-        return render_template("client_dashboard.html", data=lab_rows, prediction=prediction)
-
-   # ───────────────────── Report ───────────────────── # 
+   
+    
+    
+   # ───────────────────── CLIENT REPORT ───────────────────── #
     @app.route('/report')
     def report():
-        if "username" not in session:
+        if "username" not in session or session["role"] != "Client":
             return redirect(url_for("login"))
 
         pid = session.get("patient_id")
-        data = load_patient_data()
-        patient_df = get_patient_data_by_id(data, pid)
+        try:
+            df = load_patient_data()
+            df = df[df["Patient_ID"] == pid]
 
-        # Sort to get latest record
-        if not patient_df.empty:
-            patient_df["Date"] = pd.to_datetime(patient_df["Date"], errors="coerce")
-            patient_df = patient_df.dropna(subset=["Date"])
-            patient_df = patient_df.sort_values(by="Date")
-            latest_record = patient_df.iloc[-1].to_dict()
-        else:
-            latest_record = {}
+            if df.empty:
+                return render_template("report.html", record={})
 
-        return render_template("report.html", record=latest_record)
+            # Ensure date parsing works and handles missing/invalid formats
+            df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
+            df = df.dropna(subset=["Date"])
+            df = df.sort_values(by="Date")
+
+            # Handle case where Date column had all invalid entries
+            if df.empty:
+                return render_template("report.html", record={})
+
+            latest_record = df.iloc[-1].fillna("N/A").to_dict()
+
+            return render_template("report.html", record=latest_record)
+
+        except Exception as e:
+            print(f"[ERROR: /report] {e}")
+            return render_template("report.html", record={})
+
+    
+    
     
     # ───────────────────── Download Report PDF ───────────────────── #
     @app.route('/download_report_pdf')
     def download_report_pdf():
-        df = pd.read_csv(os.path.join('data', 'tbm_data.csv'))
-        latest_record = df.iloc[-1]
+        import time
+        if "username" not in session or session["role"] != "Client":
+            return redirect(url_for("login"))
+
+        pid = session.get("patient_id")
+        df = load_patient_data()
+
+        df = df[df["Patient_ID"] == pid]
+        if df.empty:
+            return "No records found for this patient", 404
+
+        df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
+        df = df.dropna(subset=["Date"])
+
+        latest_idx = df["Date"].idxmax()
+        latest_record = df.loc[latest_idx].fillna("N/A")
+
+        print("[DEBUG] Latest record for PDF:", latest_record.to_dict())  # ✅ Debug
 
         from fpdf import FPDF
         pdf = FPDF()
@@ -350,10 +307,13 @@ def init_routes(app):
             value = latest_record[col] if col in latest_record else "N/A"
             pdf.cell(200, 10, txt=f"{col}: {value}", ln=1)
 
-        pdf_path = "latest_report.pdf"
+        pdf_path = f"latest_report_{int(time.time())}.pdf"
         pdf.output(pdf_path)
 
         return send_file(pdf_path, as_attachment=True)
+
+
+
 
  # ───────────────────── Admin_PDF_Download───────────────────── # 
 
