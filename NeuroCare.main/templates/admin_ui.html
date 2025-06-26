@@ -1,61 +1,257 @@
 {% extends 'layout.html' %}
 {% block content %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+
+<style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f0f2f5;
+  }
+
+  .dashboard {
+    display: flex;
+    height: 100vh;
+  }
+
+  .card-grid stat-card h4 {
+    color: #1c4450;
+  }
+
+  /* Sidebar styles */
+  .sidebar {
+    width: 250px;
+    background-color: #1c4450;
+    color: white;
+    padding: 30px 20px;
+    font-size: 20px;
+  }
+
+  .sidebar h3 {
+    margin-bottom: 20px;
+    font-size: 22px;
+    border-bottom: 2px solid #ffffff33;
+    padding-bottom: 10px;
+  }
+
+  .sidebar p {
+    font-size: 20px;
+    margin: 10px 0;
+  }
+
+  .sidebar a {
+    color: #aad4db;
+    text-decoration: none;
+    display: block;
+    margin-top: 15px;
+    font-weight: 600;
+  }
+
+  .sidebar a:hover {
+    color: #ffffff;
+  }
+
+  .main-content {
+    flex: 1;
+    padding: 30px;
+    background-color: #ffffff;
+    overflow-y: auto;
+  }
+
+  .info-card {
+    background-color: #bce2ed;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+  }
+
+  .card-grid {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+  }
+
+  .stat-card,
+  .form-container {
+    flex: 1;
+    min-width: 200px;
+    height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+  }
+
+  .stat-card {
+    background-color: #c2edea;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    font-size: 20px;
+    font-weight: bold;
+    color: #1c4450;
+  }
+
+  .stat-card h4{
+    color: #1c4450;
+  }
+
+  .form-container {
+    background-color: #c2edea;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+
+  .form-container form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  .form-container input {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    width: 100%;
+  }
+
+  .form-container button {
+    background-color: #1c4450;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .charts-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .chart-card {
+    flex: 1;
+    background-color: #bce2ed;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    height: 360px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 300px;
+  }
+
+  h2, h3, h4 {
+    color: #1c4450;
+  }
+
+  p {
+    font-size: 15px;
+  }
+
+  canvas {
+    max-width: 100%;
+    max-height: 260px;
+  }
+
+  .btn-link {
+    padding: 10px 16px;
+    background: #1c4450;
+    color: white;
+    border-radius: 4px;
+    text-decoration: none;
+  }
+
+  @media (max-width: 768px) {
+    .card-grid,
+    .charts-container {
+      flex-direction: column;
+    }
+
+    .dashboard {
+      flex-direction: column;
+      height: auto;
+    }
+
+    .sidebar {
+      width: 100%;
+      box-shadow: none;
+      padding: 15px 20px;
+    }
+
+    .main-content {
+      padding: 20px;
+    }
+  }
+</style>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<div class="dashboard-container">
+<div class="dashboard">
 
-  <!-- Admin Welcome -->
-  <div class="card info-card">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-      <div>
-        <h2>Welcome, Admin!</h2>
-        <p>This dashboard displays trends and statistics from the TBM dataset.</p>
-      </div>
-      <div>
-        <a href="{{ url_for('admin_dashboard') }}" style="padding: 10px 16px; background: #007bff; color: white; border-radius: 4px; text-decoration: none;">View Records</a>
-      </div>
-    </div>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h3>Admin Panel</h3>
+    <p><strong>Username:</strong> {{ session.get('username') }}</p>
+    <p><strong>Role:</strong> {{ session.get('role') }}</p>
+    <a href="{{ url_for('logout') }}">Logout</a>
   </div>
 
-  <!-- Stat Cards -->
-  <div class="card-grid">
-    <div class="card stat-card">
-      <h4>Total Records</h4>
-      <p>{{ total_records }}</p>
-    </div>
-    <div class="card stat-card">
-      <h4>Total Unique Patients</h4>
-      <p>{{ total_patients }}</p>
+  <!-- Main Content -->
+  <div class="main-content">
+
+    <!-- Admin Welcome Card -->
+    <div class="info-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+        <div>
+          <h2>Welcome, Admin!</h2>
+          <p>This dashboard displays trends and statistics from the TBM dataset.</p>
+        </div>
+        <div>
+          <a href="{{ url_for('admin_dashboard') }}" class="btn-link">View Records</a>
+        </div>
+      </div>
     </div>
 
-    <div style="background-color: #c2edea; padding: 20px; border-radius: 15px; margin: 10px; flex: 1;">
-  <form action="{{ url_for('admin_generate_report') }}" method="post" style="display: flex; flex-direction: column; align-items: center;">
-    <label for="admin_pid" style="font-weight: bold; color: #007bff; margin-bottom: 10px;">Generate Patient Report</label>
-    <input type="text" id="admin_pid" name="patient_id" placeholder="Enter Patient ID"
-           style="padding: 8px; border-radius: 5px; border: 1px solid #ccc; margin-bottom: 10px; width: 100%;">
-    <button type="submit"
-            style="background-color: #007bff; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer;">
-      Generate
-    </button>
-  </form>
-</div>
-  
-</div>
-
-  <!-- Charts -->
-  <div class="charts-container">
-    <!-- Diagnosis Distribution -->
-    <div class="card chart-card">
-      <h3>Diagnosis Distribution</h3>
-      <canvas id="diagnosisChart"></canvas>
+    <!-- Stat Cards + Report Form -->
+    <div class="card-grid">
+      <div class="stat-card">
+        <h4>Total Abnormal Records</h4>
+        <p>{{ total_records }}</p>
+      </div>
+      <div class="stat-card">
+        <h4>Total Unique Patients</h4>
+        <p>{{ total_patients }}</p>
+      </div>
+      <div class="form-container">
+        <form action="{{ url_for('admin_generate_report') }}" method="post">
+          <label for="admin_pid" style="font-weight: bold; color: #1c4450; margin-bottom: 10px;">Generate Patient Report</label>
+          <input type="text" id="admin_pid" name="patient_id" placeholder="Enter Patient ID">
+          <button type="submit">Generate</button>
+        </form>
+      </div>
     </div>
 
-    <!-- TBM Score Distribution -->
-    <div class="card chart-card">
-      <h3>TBM Score Distribution (Abnormal Cases)</h3>
-      <canvas id="tbmScoreChart"></canvas>
+    <!-- Charts Section -->
+    <div class="charts-container">
+      <div class="chart-card">
+        <h3>Diagnosis Distribution</h3>
+        <canvas id="diagnosisChart"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>TBM Score Distribution (Abnormal Cases)</h3>
+        <canvas id="tbmScoreChart"></canvas>
+      </div>
     </div>
+
   </div>
 </div>
 
@@ -64,7 +260,6 @@
   const predSummary = JSON.parse(`{{ pred_summary | tojson | safe }}`);
   const tbmScores = JSON.parse(`{{ tbm_score_dist | tojson | safe }}`);
 
-  // Diagnosis Pie Chart
   new Chart(document.getElementById('diagnosisChart'), {
     type: 'pie',
     data: {
@@ -89,7 +284,6 @@
     }
   });
 
-  // TBM Score Bar Chart
   new Chart(document.getElementById('tbmScoreChart'), {
     type: 'bar',
     data: {
@@ -127,4 +321,5 @@
     }
   });
 </script>
+
 {% endblock %}

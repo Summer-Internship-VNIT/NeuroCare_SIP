@@ -94,9 +94,11 @@
   .download-btn-container a:hover {
     background-color: #1e7e34;
   }
+
   .diagnosis-abnormal {
     color: red;
   }
+
   .diagnosis-normal {
     color: green;
   }
@@ -105,7 +107,7 @@
 <div class="report-container">
   <!-- Top Right Dashboard Button -->
   <div class="top-links">
-    <a href="{{ url_for('dashboard') }}">← Back to Dashboard</a>
+    <a href="{{ url_for('client_dashboard') }}">← Back to Dashboard</a>
   </div>
 
   <h2>Patient Report</h2>
@@ -115,11 +117,11 @@
       <p><strong>Patient ID:</strong> {{ record['Patient_ID'] }}</p>
       <p><strong>Date:</strong> {{ record['Date'] }}</p>
       <p><strong>Sample Code:</strong> {{ record['Sample Code'] }}</p>
-        <span class="{% if record['Diagnosis'] == 'Abnormal' %}diagnosis-abnormal{% else %}diagnosis-normal{% endif %}">
-          {{ record['Diagnosis'] }}
-        </span>
       <p><strong>Sugar:</strong> {{ record['Sugar'] }}</p>
       <p><strong>Protein:</strong> {{ record['Protein'] }}</p>
+      <p><strong>TLC:</strong> {{ record['TLC'] }}</p>
+      <p><strong>L% (Lymphocytes):</strong> {{ record['L%'] }}</p>
+      <p><strong>P% (Polymorphs):</strong> {{ record['P%'] }}</p>
       <p><strong>Diagnosis:</strong>
         <span class="{% if record['Diagnosis'] == 'Abnormal' %}diagnosis-abnormal{% else %}diagnosis-normal{% endif %}">
           {{ record['Diagnosis'] }}

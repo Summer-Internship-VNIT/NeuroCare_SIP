@@ -20,6 +20,10 @@ from fpdf import FPDF
 from flask import current_app
 from flask import Flask, render_template, request, redirect, url_for, send_file, current_app
 
+app = Flask(__name__)
+app.secret_key = "2345"  # replace with a secure random key
+
+
 
 
 USER_CSV            = "users.csv"                      # username | password | role | patient_id
@@ -48,26 +52,78 @@ def init_routes(app):
     @app.route("/login", methods=["GET", "POST"])
     def login():
         if request.method == "POST":
-            users     = load_user_data()
-            username  = request.form["username"]
-            password  = request.form["password"]
+            users = load_user_data()
+            username = request.form["username"]
+            password = request.form["password"]
 
             row = users[users["username"] == username]
             if row.empty or not check_password_hash(row.iloc[0]["password"], password):
                 return render_template("login.html", error="Invalid credentials")
 
-            # Save minimal session
-            session["username"]   = username
-            session["role"]       = row.iloc[0]["role"]
-            session["patient_id"] = row.iloc[0]["patient_id"]
+            # Set session values
+            session["username"] = username
+            session["role"] = row.iloc[0]["role"]
 
-            # Redirect logic
+            if row.iloc[0]["role"] == "Client":
+                session["patient_id"] = row.iloc[0].get("patient_id")
+
+            # Redirect based on role
             if session["role"] == "Admin":
-                return redirect(url_for("dashboard"))
+                return redirect(url_for("admin_ui"))
             else:
                 return redirect(url_for("data_entry"))
 
         return render_template("login.html")
+
+
+    
+    @app.route("/admin_ui", methods=["GET", "POST"])
+    def admin_ui():
+        import pandas as pd
+        import os
+
+        data_path = os.path.join("data", "tbm_data.csv")
+
+        if not os.path.exists(data_path):
+            pred_summary = {}
+            tbm_score_dist = {}
+            total_records = 0
+            total_patients = 0
+        else:
+            df = pd.read_csv(data_path)
+            df = df.dropna(subset=["Diagnosis", "TBM Score", "Patient_ID"])
+
+            # Get diagnosis counts
+            df["Diagnosis"] = df["Diagnosis"].str.strip().str.capitalize()
+            pred_summary = df["Diagnosis"].value_counts().to_dict()
+
+            # Ensure both keys exist with default 0 if missing
+            for label in ["Normal", "Abnormal"]:
+                if label not in pred_summary:
+                    pred_summary[label] = 0
+
+            # Convert keys and values to string and int explicitly
+            pred_summary = {str(k): int(v) for k, v in pred_summary.items()}
+
+            # TBM Score distribution
+            tbm_score_dist = df["TBM Score"].astype(str).value_counts().sort_index().to_dict()
+            tbm_score_dist = {str(k): int(v) for k, v in tbm_score_dist.items()}
+
+            total_records = len(df)
+            total_patients = df["Patient_ID"].nunique()
+
+        return render_template(
+            "admin_ui.html",
+            pred_summary=pred_summary,
+            tbm_score_dist=tbm_score_dist,
+            total_records=total_records,
+            total_patients=total_patients
+        )
+
+
+
+
+
 
     # ───────────────────────── SIGN-UP ───────────────────────── #
     @app.route("/signup", methods=["GET", "POST"])
@@ -152,13 +208,13 @@ def init_routes(app):
             df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
             df.to_csv(TBM_DATA_CSV, index=False)
 
-            return redirect(url_for("dashboard"))
+            return redirect(url_for("client_dashboard"))
 
         return render_template("data_entry.html")
     
      # ───────────────────── CLIENT DASHBOARD ───────────────────── #
-    @app.route("/dashboard")
-    def dashboard():
+    @app.route("/client_dashboard")
+    def client_dashboard():
         if "username" not in session:
             return redirect(url_for("login"))
 
@@ -201,7 +257,7 @@ def init_routes(app):
 
       # ───────────────────── ADMIN DASHBOARD ───────────────────── #
 
-    @app.route('/admin/dashboard')
+    @app.route('/admin_dashboard')
     def admin_dashboard():
         try:
             df = pd.read_csv(TBM_DATA_CSV)  # Ensure TBM_DATA_CSV is defined
@@ -239,8 +295,8 @@ def init_routes(app):
 
    
     
-    
-   # ───────────────────── CLIENT REPORT ───────────────────── #
+
+    # ───────────────────── CLIENT REPORT ───────────────────── #
     @app.route('/report')
     def report():
         if "username" not in session or session["role"] != "Client":
@@ -271,8 +327,6 @@ def init_routes(app):
             print(f"[ERROR: /report] {e}")
             return render_template("report.html", record={})
 
-    
-    
     
     # ───────────────────── Download Report PDF ───────────────────── #
     @app.route('/download_report_pdf')
@@ -316,10 +370,6 @@ def init_routes(app):
 
 
  # ───────────────────── Admin_PDF_Download───────────────────── # 
-
-    from flask import send_file, request
-    import pandas as pd
-    from fpdf import FPDF
 
     @app.route('/admin_download_report_pdf/<patient_id>')
     def admin_download_report_pdf(patient_id):
