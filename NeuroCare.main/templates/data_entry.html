@@ -2,88 +2,146 @@
 {% block content %}
 <style>
   body {
-    background-color: #9cc4d0;
-    color: #000000;
+    background: linear-gradient(135deg,rgb(224, 250, 254),rgb(201, 235, 241));
     font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #003c4d;
   }
 
   .form-card {
-    max-width: 600px;
-    margin: auto;
-    background-color: #ffffff;
-    padding: 30px;
-    border-radius: 16px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    max-width: 950px;
+    margin: 50px auto;
+    background: linear-gradient(135deg, #ffffff, #f0f9ff);
+    padding: 40px 50px;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border-left: 8px solid #00a8cc;
   }
 
   h2 {
     text-align: center;
-    margin-bottom: 20px;
-    color: #000000;
+    font-size: 30px;
+    margin-bottom: 40px;
+    color: #007c91;
+    font-weight: 600;
   }
 
-  label {
+  .input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+    justify-content: center;
+  }
+
+  .field-card {
+    background-color:rgb(230, 247, 253);
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 4px 10px rgba(0, 168, 204, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .field-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(12, 78, 93, 0.15);
+  }
+
+  .field-card label {
+    font-weight: 600;
     display: block;
-    margin-top: 15px;
-    font-weight: 500;
+    margin-bottom: 10px;
+    color: #005a70;
+    font-size: 15px;
   }
 
-  input[type="text"],
-  input[type="number"],
-  input[type="date"] {
-    width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 16px;
+  .field-card input {
+    width: 90%;
+    padding: 12px 14px;
+    font-size: 15px;
+    border: 1px solid #cde4ea;
+    border-radius: 8px;
+    background-color: #ffffff;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .field-card input:focus {
+    border: 1.5px solid #00a8cc;
+    outline: none;
+    box-shadow: 0 0 6px rgba(1, 8, 10, 0.93);
   }
 
   button {
-    margin-top: 25px;
-    width: 100%;
-    padding: 12px;
+    margin: 40px auto 0;
+    display: block;
+    width: 60%;
+    max-width: 300px;
+    padding: 14px;
     border: none;
     border-radius: 10px;
-    background-color: #3f80ea;
+    background: linear-gradient(to right, #00a8cc, #007c91);
     color: white;
+    font-size: 17px;
     font-weight: bold;
-    font-size: 16px;
     cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s;
+    box-shadow: 0 4px 12px rgba(0, 168, 204, 0.2);
   }
 
   button:hover {
-    background-color: #2a62c9;
+    background: linear-gradient(to right,rgb(14, 81, 93), #00a8cc);
+    transform: scale(1.03);
+  }
+
+  @media (max-width: 600px) {
+    .form-card {
+      padding: 30px 20px;
+    }
+
+    button {
+      width: 100%;
+    }
   }
 </style>
 
 <div class="form-card">
-  <h2>Enter Laboratory Details</h2>
+  <h2>🧬 Laboratory Data Entry</h2>
   <form method="POST">
-    <label>Date:</label>
-    <input type="date" name="date" required>
+    <div class="input-grid">
+      <div class="field-card">
+        <label>Date</label>
+        <input type="date" name="date" required>
+      </div>
+      <div class="field-card">
+        <label>Sample Code</label>
+        <input type="text" name="sample_code" required>
+      </div>
+      <div class="field-card">
+        <label>Total Cell Count (TLC)</label>
+        <input type="number" name="tlc" required>
+      </div>
+      <div class="field-card">
+        <label>Lymphocytes (L %)</label>
+        <input type="number" name="l_percent" required>
+      </div>
+      <div class="field-card">
+        <label>Polymorphs (P %)</label>
+        <input type="number" name="p_percent" required>
+      </div>
+      <div class="field-card">
+        <label>Sugar (mg/dL)</label>
+        <input type="number" name="sugar" required>
+      </div>
+      <div class="field-card" style="min-width: 260px; width: 85%;">
 
-    <label>Sample Code:</label>
-    <input type="text" name="sample_code" required>
+        <label>Protein (mg/dL)</label>
+        <input type="number" name="protein" required>
+      </div>
+    </div>
 
-    <label>Total Cell Count (TLC):</label>
-    <input type="number" name="tlc" required>
-
-    <label>Lymphocytes (L %):</label>
-    <input type="number" name="l_percent" required>
-
-    <label>Polymorphs (P %):</label>
-    <input type="number" name="p_percent" required>
-
-    <label>Sugar (mg/dL):</label>
-    <input type="number" name="sugar" required>
-
-    <label>Protein (mg/dL):</label>
-    <input type="number" name="protein" required>
-
-  
-
-    <button type="submit">Submit</button>
+    <button type="submit">Submit Report</button>
   </form>
 </div>
 {% endblock %}
+
+
