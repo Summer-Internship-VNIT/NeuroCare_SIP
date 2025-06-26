@@ -3,117 +3,156 @@
 
 <style>
   body {
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #f8f9fa;
-    color: #333;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #f0fdfa, #ffffff);
+    margin: 0;
+    padding: 0;
+    color: #01353f;
     line-height: 1.8;
   }
 
   .blog-container {
-    max-width: 950px;
-    margin: 40px auto;
-    padding: 30px;
+    max-width: 1000px;
+    margin: 60px auto;
     background: #ffffff;
-    box-shadow: 0 0 20px rgba(0,0,0,0.05);
-    border-radius: 12px;
+    padding: 60px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 160, 160, 0.15);
+    animation: dropIn 1s ease-out;
+    border: 2px dashed #00bcd4;
+  }
+
+  @keyframes dropIn {
+    0% {
+      opacity: 0;
+      transform: translateY(-50px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   .blog-container h1 {
+    font-size: 38px;
     text-align: center;
+    background: -webkit-linear-gradient(#00acc1, #004d5d);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     margin-bottom: 30px;
-    color: #2c3e50;
-    font-size: 32px;
-    border-bottom: 2px solid #007bff;
-    padding-bottom: 10px;
+    border-bottom: 4px double #00bcd4;
+    padding-bottom: 14px;
+    letter-spacing: 1px;
   }
 
   .blog-section {
-    margin-bottom: 30px;
+    margin-bottom: 45px;
+    padding: 35px;
+    border-left: 6px solid #00bcd4;
+    border-radius: 14px;
+    background: linear-gradient(145deg, #e6ffff, #f9ffff);
+    box-shadow: 0 4px 12px rgba(0, 200, 220, 0.1);
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .blog-section:hover {
+    transform: scale(1.02);
   }
 
   .blog-section h2 {
-    color: #007bff;
+    font-size: 24px;
+    color: #007c91;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .blog-section h2::before {
+    content: "🩺";
     font-size: 22px;
-    margin-bottom: 10px;
   }
 
   .blog-section p,
-  .blog-section ul {
-    font-size: 16px;
-    margin-bottom: 10px;
+  .blog-section ul,
+  .blog-note {
+    font-size: 17px;
+    color: #334;
   }
 
   .blog-section ul {
-    padding-left: 20px;
+    padding-left: 25px;
+    margin-top: 10px;
+  }
+
+  .blog-section ul li {
+    margin-bottom: 10px;
+    list-style: circle;
   }
 
   .highlight-box {
-    background-color: #eaf4ff;
-    border-left: 5px solid #007bff;
-    padding: 10px 15px;
-    border-radius: 6px;
-    margin: 10px 0;
+    background: linear-gradient(to right, #f1f8e9, #e0f2f1);
+    border-left: 8px solid #009688;
+    padding: 18px 24px;
+    font-weight: 600;
+    border-radius: 14px;
+    box-shadow: inset 0 0 10px rgba(0, 128, 128, 0.1);
+    margin-top: 12px;
   }
 
   table {
     width: 100%;
+    margin-top: 25px;
     border-collapse: collapse;
-    margin: 20px 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
   }
 
-  table, th, td {
-    border: 1px solid #ccc;
+  th, td {
+    padding: 14px;
+    text-align: center;
+    border: 1px solid #cceeff;
+    font-size: 16px;
   }
 
   th {
-    background-color: #f1f1f1;
+    background-color: #00bcd4;
+    color: white;
     font-weight: bold;
-    text-align: left;
-    padding: 10px;
-  }
-
-  td {
-    padding: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 
   .interpretation-table {
-    width: 60%;
-    margin: auto;
+    width: 80%;
+    margin: 40px auto;
   }
 
   .blog-note {
     font-style: italic;
-    color: #555;
-    margin-top: 10px;
-  }
-
-  th {
-  background-color: #eaf4ff;         /* highlight-box background */
-  border-left: 5px solid #007bff;    /* highlight-box left border */
-  color: #000;                       /* black text */
-  font-weight: bold;
-  text-align: center;                /* center-aligned */
-  padding: 10px;
-}
-
-  th.highlight-header {
-  background-color: #eaf4ff;
-  border-left: 5px solid #007bff;
-  color: #000;
-  font-weight: bold;
-  text-align: center;
-  padding: 10px;
+    color: #666;
+    text-align: center;
+    margin-top: 12px;
   }
 
   @media screen and (max-width: 768px) {
     .blog-container {
+      padding: 30px;
+    }
+
+    .interpretation-table {
+      width: 100%;
+    }
+
+    .blog-section {
       padding: 20px;
     }
   }
 </style>
 
 <div class="blog-container">
-  <h1>🧠 Understanding Tuberculous Meningitis (TBM)</h1>
+  <h1> 🧠 Understanding Tuberculous Meningitis (TBM)</h1>
 
   <div class="blog-section">
     <h2>🧠 What Is Tuberculous Meningitis (TBM)?</h2>
