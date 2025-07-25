@@ -10,7 +10,7 @@ Welcome to the **NeuroCare** repository. NeuroCare is an AI-driven clinical deci
 **NeuroCare** is a comprehensive, AI-powered solution developed in collaboration with CIIMS Hospital & Research Center. The platform classifies CSF reports as "Normal" or "Abnormal" (suspected TBM), assigns a clinician-friendly TBM Severity Score, and offers real-time dashboards and automated PDF reporting for clinical workflows.
 
 ## Project Webpage
-Access the live NeuroCare application and TBM Dashboard here: TBM Dashboard
+Access the live NeuroCare application and TBM Dashboard here: [TBM Dashboard](http://127.0.0.1:5000/home)
 
 ## Features
 
