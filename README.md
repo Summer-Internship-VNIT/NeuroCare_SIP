@@ -1,5 +1,5 @@
 # NeuroCare
-### :AI-Powered Diagnostic System for Early Detection of Tuberculous Meningitis
+### AI-Powered Diagnostic System for Early Detection of Tuberculous Meningitis
 
 Welcome to the **NeuroCare** repository. NeuroCare is an AI-driven clinical decision support tool designed to assist in the early detection of Tuberculous Meningitis (TBM) using Cerebrospinal Fluid (CSF) biomarker analysis. Developed as part of a Summer Internship Program at VNIT Nagpur, this project integrates machine learning, advanced data engineering, and full-stack web development to provide a deployable diagnostics platform for clinical environments.
 
