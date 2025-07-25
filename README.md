@@ -3,14 +3,14 @@
 
 Welcome to the **NeuroCare** repository. NeuroCare is an AI-driven clinical decision support tool designed to assist in the early detection of Tuberculous Meningitis (TBM) using Cerebrospinal Fluid (CSF) biomarker analysis. Developed as part of a Summer Internship Program at VNIT Nagpur, this project integrates machine learning, advanced data engineering, and full-stack web development to provide a deployable diagnostics platform for clinical environments.
 
+## Project Webpage
+Access the live NeuroCare application and TBM Dashboard here: [TBM Dashboard](http://127.0.0.1:5000/home)
+
 ## Introduction
 
 **Tuberculous Meningitis (TBM)** is a severe condition that poses significant diagnostic challenges due to nonspecific symptoms and overlapping biomarker profiles. Timely, accurate diagnosis is essential to prevent fatal outcomes and long-term neurological complications.
 
 **NeuroCare** is a comprehensive, AI-powered solution developed in collaboration with CIIMS Hospital & Research Center. The platform classifies CSF reports as "Normal" or "Abnormal" (suspected TBM), assigns a clinician-friendly TBM Severity Score, and offers real-time dashboards and automated PDF reporting for clinical workflows.
-
-## Project Webpage
-Access the live NeuroCare application and TBM Dashboard here: [TBM Dashboard](http://127.0.0.1:5000/home)
 
 ## Features
 
