@@ -13,7 +13,6 @@ with open(MODEL_PATH, 'rb') as f:
     model = pickle.load(f)
 
 
-
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Secure sessions
 

@@ -76,6 +76,49 @@ def init_routes(app):
         return render_template("login.html")
 
 
+    # ────────────────────────── Admin UI ────────────────────────── #
+    # @app.route("/admin_ui", methods=["GET", "POST"])
+    # def admin_ui():
+    #     import pandas as pd
+    #     import os
+
+    #     data_path = os.path.join("data", "tbm_data.csv")
+
+    #     if not os.path.exists(data_path):
+    #         pred_summary = {}
+    #         tbm_score_dist = {}
+    #         total_records = 0
+    #         total_patients = 0
+    #     else:
+    #         df = pd.read_csv(data_path)
+    #         df = df.dropna(subset=["Diagnosis", "TBM Score", "Patient_ID"])
+
+    #         # Get diagnosis counts
+    #         df["Diagnosis"] = df["Diagnosis"].str.strip().str.capitalize()
+    #         pred_summary = df["Diagnosis"].value_counts().to_dict()
+
+    #         # Ensure both keys exist with default 0 if missing
+    #         for label in ["Normal", "Abnormal"]:
+    #             if label not in pred_summary:
+    #                 pred_summary[label] = 0
+
+    #         # Convert keys and values to string and int explicitly
+    #         pred_summary = {str(k): int(v) for k, v in pred_summary.items()}
+
+    #         # TBM Score distribution
+    #         tbm_score_dist = df["TBM Score"].astype(str).value_counts().sort_index().to_dict()
+    #         tbm_score_dist = {str(k): int(v) for k, v in tbm_score_dist.items()}
+
+    #         total_records = len(df)
+    #         total_patients = df["Patient_ID"].nunique()
+
+    #     return render_template(
+    #         "admin_ui.html",
+    #         pred_summary=pred_summary,
+    #         tbm_score_dist=tbm_score_dist,
+    #         total_records=total_records,
+    #         total_patients=total_patients
+    #     )
     
     @app.route("/admin_ui", methods=["GET", "POST"])
     def admin_ui():
@@ -93,16 +136,14 @@ def init_routes(app):
             df = pd.read_csv(data_path)
             df = df.dropna(subset=["Diagnosis", "TBM Score", "Patient_ID"])
 
-            # Get diagnosis counts
+            # Clean diagnosis text
             df["Diagnosis"] = df["Diagnosis"].str.strip().str.capitalize()
-            pred_summary = df["Diagnosis"].value_counts().to_dict()
 
-            # Ensure both keys exist with default 0 if missing
-            for label in ["Normal", "Abnormal"]:
-                if label not in pred_summary:
-                    pred_summary[label] = 0
+            # Map all non-normal diagnoses to "Abnormal"
+            df["Label"] = df["Diagnosis"].apply(lambda x: "Normal" if x == "Normal" else "Abnormal")
 
-            # Convert keys and values to string and int explicitly
+            # Get counts for pie chart
+            pred_summary = df["Label"].value_counts().to_dict()
             pred_summary = {str(k): int(v) for k, v in pred_summary.items()}
 
             # TBM Score distribution
@@ -119,10 +160,6 @@ def init_routes(app):
             total_records=total_records,
             total_patients=total_patients
         )
-
-
-
-
 
 
     # ───────────────────────── SIGN-UP ───────────────────────── #
@@ -191,7 +228,7 @@ def init_routes(app):
                 "Sr No.": next_sr,
                 "Date": request.form["date"],
                 "Sample Code": request.form["sample_code"],
-                "Patient_ID": patient_id,
+                "Patient_ID": request.form.get("patient_id"),
                 "TLC": float(request.form["tlc"]),
                 "L%": float(request.form["l_percent"]),
                 "P%": float(request.form["p_percent"]),

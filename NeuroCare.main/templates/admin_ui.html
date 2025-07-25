@@ -170,7 +170,57 @@
     text-decoration: none;
   }
 
-  @media (max-width: 768px) {
+  .sidebar {
+  width: 250px;
+  height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* left-align text */
+}
+
+.avatar {
+  width: 100%;
+  display: flex;
+  justify-content: center; /* horizontally center the icon */
+  margin-bottom: 10px;
+}
+
+.avatar img {
+  width: 60px;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  border-radius: 0; /* remove circular shape */
+}
+
+/* White line just below the icon */
+.sidebar-line {
+  width: 100%;
+  height: 2px;
+  background-color: white;
+  border: none;
+  margin: 0 0 15px 0;
+}
+
+/* Left-align all following content */
+.sidebar h3,
+.sidebar p,
+.sidebar a {
+  width: 100%;
+  text-align: left;
+  margin-bottom: 5px;
+}
+.sidebar h3 {
+  color: #f9f7f7; /* or any contrasting color */
+  margin: 5px 0;
+  text-align: center;
+}
+
+
+
+@media (max-width: 768px) {
     .card-grid,
     .charts-container {
       flex-direction: column;
@@ -179,12 +229,6 @@
     .dashboard {
       flex-direction: column;
       height: auto;
-    }
-
-    .sidebar {
-      width: 100%;
-      box-shadow: none;
-      padding: 15px 20px;
     }
 
     .main-content {
@@ -199,6 +243,9 @@
 
   <!-- Sidebar -->
   <div class="sidebar">
+    <div class="avatar">
+          <img src="{{ url_for('static', filename='images/institution.png') }}" alt="Profile Picture">
+    </div>
     <h3>Admin Panel</h3>
     <p><strong>Username:</strong> {{ session.get('username') }}</p>
     <p><strong>Role:</strong> {{ session.get('role') }}</p>
@@ -212,8 +259,8 @@
     <div class="info-card">
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
         <div>
-          <h2>Welcome, Admin!</h2>
-          <p>This dashboard displays trends and statistics from the TBM dataset.</p>
+          <h1>Welcome, Admin!</h1>
+          <h4>This dashboard displays trends and statistics from the TBM dataset.</h4>
         </div>
         <div>
           <a href="{{ url_for('admin_dashboard') }}" class="btn-link">View Records</a>
@@ -256,7 +303,7 @@
 </div>
 
 <!-- Chart Script -->
-<script>
+<!-- <script>
   const predSummary = JSON.parse(`{{ pred_summary | tojson | safe }}`);
   const tbmScores = JSON.parse(`{{ tbm_score_dist | tojson | safe }}`);
 
@@ -267,6 +314,71 @@
       datasets: [{
         data: Object.values(predSummary),
         backgroundColor: ['#36A2EB', '#FF6384', '#FFCE56'],
+        hoverOffset: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Diagnosis Summary'
+        },
+        legend: {
+          position: 'bottom'
+        }
+      }
+    }
+  });
+
+  new Chart(document.getElementById('tbmScoreChart'), {
+    type: 'bar',
+    data: {
+      labels: Object.keys(tbmScores),
+      datasets: [{
+        label: 'Patients',
+        data: Object.values(tbmScores),
+        backgroundColor: '#8e44ad'
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'TBM Score Distribution'
+        },
+        legend: { display: false }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Count'
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'TBM Score'
+          }
+        }
+      }
+    }
+  });
+</script> -->
+<script>
+  const predSummary = JSON.parse(`{{ pred_summary | tojson | safe }}`);
+  const tbmScores = JSON.parse(`{{ tbm_score_dist | tojson | safe }}`);
+
+  new Chart(document.getElementById('diagnosisChart'), {
+    type: 'pie',
+    data: {
+      labels: Object.keys(predSummary),
+      datasets: [{
+        data: Object.values(predSummary),
+        backgroundColor: ['#36A2EB', '#FF6384'],
         hoverOffset: 4
       }]
     },
