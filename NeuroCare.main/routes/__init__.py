@@ -238,8 +238,13 @@ def init_routes(app):
             diagnosis_label = prediction.get("condition", "N/A")
             model_output_percentage = prediction.get("tbm_score", "N/A")
 
-            # Interpret message based on score
+            # 🛠️ Replace 'Abnormal' with 'TBM' only
+            if diagnosis_label == "Abnormal":
+                diagnosis_label = "TBM"
+
+            # ✅ Always interpret the score
             diagnosis_message = interpret_tbm_score(model_output_percentage)
+
         else:
             diagnosis_label = ""
             model_output_percentage = ""
@@ -252,7 +257,7 @@ def init_routes(app):
             model_output_percentage=model_output_percentage,
             diagnosis_message=diagnosis_message
         )
-    
+
     
 
       # ───────────────────── ADMIN DASHBOARD ───────────────────── #

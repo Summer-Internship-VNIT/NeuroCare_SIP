@@ -93,7 +93,7 @@
                 <td>{{ row['P%'] }}</td>
                 <td>{{ row['Sugar'] }}</td>
                 <td>{{ row['Protein'] }}</td>
-                <td>{{ row['Diagnosis'] }}</td>
+                <td>{{ 'TBM' if row['Diagnosis'] == 'Abnormal' else row['Diagnosis'] }}</td>
               </tr>
               {% endfor %}
             </tbody>

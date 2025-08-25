@@ -10,6 +10,43 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Institute  */
+.institute-heading {
+    background-color: #3c3535 ;
+    border-bottom: 2px solid #35322f;
+    padding: 10px 20px;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.institute-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.institute-logo {
+    height: 80px;
+    width: auto;
+}
+
+.institute-text h1 {
+    font-size: 20px;
+    margin: 0;
+    color: #f0e8db;
+    font-weight: 700;
+    font-family: 'Noto Sans Devanagari', 'Mangal', sans-serif;
+}
+
+.institute-text h2 {
+    font-size: 18px;
+    margin: 5px 0 0;
+    color: #f0e8db;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
 
 /* home section starts */
 header {
