@@ -16,6 +16,7 @@
       </div>
       <div class="nav-menu">
         <ul>
+          <li><a href="{{ url_for('home') }}">Home</a></li>
           <li><a href="{{ url_for('data_entry') }}">Data Entry</a></li>
           <li><a href="{{ url_for('report') }}">Report</a></li>
           <li><a href="{{ url_for('login') }}">Logout</a></li>
@@ -24,6 +25,46 @@
     </div>
 
     <!-- Main Content -->
+
+<style>
+  .header h1 {
+  font-size: 32px; /* Increase this value as needed */
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+  .line-chart {
+    height: calc(100% + 1mm);
+  }
+  #sugarProteinChart {
+    height: 100% !important;
+  }
+
+.calendar {
+  height: 330px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* vertical center */
+  align-items: center;     /* horizontal center */
+  text-align: center;
+  padding: 20px 10px;
+  box-sizing: border-box;
+}
+
+.calendar-icon {
+  height: 120px;
+  width: auto;
+  object-fit: contain;
+  margin-bottom: 20px; /* Reduced gap between icon and date */
+}
+
+.calendar h3 {
+  margin-top: 0;
+  font-weight: 600;
+}
+
+
+</style>
+
     <div class="main-content">
       {% if data|length > 0 %}
       <div class="header">
@@ -32,7 +73,7 @@
 
       <div class="cards">
         <div class="card">TLC <span>{{ data[-1]['TLC'] }}</span></div>
-        <div class="card">Lymohocytes% <span>{{ data[-1]['L%'] }}%</span></div>
+        <div class="card">Lymphocytes% <span>{{ data[-1]['L%'] }}%</span></div>
         <div class="card">Polymorphs% <span>{{ data[-1]['P%'] }}%</span></div>
         <div class="card">Sugar <span>{{ data[-1]['Sugar'] }} mg/dL</span></div>
         <div class="card">Protein <span>{{ data[-1]['Protein'] }} mg/dL</span></div>
@@ -59,15 +100,19 @@
         <div class="line-chart">
           <h3>Sugar & Protein Over Time</h3>
           <canvas id="sugarProteinChart"></canvas>
-        </div>
-        <div class="calendar">
-          <h3>Latest Test</h3>
-          <p>{{ data[-1]['Date'] }}</p>
-        </div>
+      </div>
+      <div class="calendar">
+        <img src="{{ url_for('static', filename='images/calendar.png') }}" 
+            alt="Calendar Icon" class="calendar-icon">
+        <h3>Latest Test: {{ data[-1]['Date'] }}</h3>
+        
+      </div>
+
+
       </div>
 
       <div class="table-card">
-        <h3>Historical Records</h3>
+        <h2>Historical Records</h2>
         <input type="text" id="searchInput" placeholder="Search by Sample Code...">
         <div class="table-scroll">
           <table>
