@@ -1,0 +1,248 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #f0fdfa, #ffffff);
+    margin: 0;
+    padding: 0;
+    color: #01353f;
+    line-height: 1.8;
+  }
+
+  .blog-container {
+    max-width: 1000px;
+    margin: 60px auto;
+    background: #ffffff;
+    padding: 60px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 160, 160, 0.15);
+    animation: dropIn 1s ease-out;
+    border: 2px dashed #00bcd4;
+  }
+
+  @keyframes dropIn {
+    0% {
+      opacity: 0;
+      transform: translateY(-50px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .blog-container h1 {
+    font-size: 38px;
+    text-align: center;
+    background: -webkit-linear-gradient(#00acc1, #004d5d);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 30px;
+    border-bottom: 4px double #00bcd4;
+    padding-bottom: 14px;
+    letter-spacing: 1px;
+  }
+
+  .blog-section {
+    margin-bottom: 45px;
+    padding: 35px;
+    border-left: 6px solid #00bcd4;
+    border-radius: 14px;
+    background: linear-gradient(145deg, #e6ffff, #f9ffff);
+    box-shadow: 0 4px 12px rgba(0, 200, 220, 0.1);
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .blog-section:hover {
+    transform: scale(1.02);
+  }
+
+  .blog-section h2 {
+    font-size: 24px;
+    color: #007c91;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .blog-section h2::before {
+    content: "🩺";
+    font-size: 22px;
+  }
+
+  .blog-section p,
+  .blog-section ul,
+  .blog-note {
+    font-size: 17px;
+    color: #334;
+  }
+
+  .blog-section ul {
+    padding-left: 25px;
+    margin-top: 10px;
+  }
+
+  .blog-section ul li {
+    margin-bottom: 10px;
+    list-style: circle;
+  }
+
+  .highlight-box {
+    background: linear-gradient(to right, #f1f8e9, #e0f2f1);
+    border-left: 8px solid #009688;
+    padding: 18px 24px;
+    font-weight: 600;
+    border-radius: 14px;
+    box-shadow: inset 0 0 10px rgba(0, 128, 128, 0.1);
+    margin-top: 12px;
+  }
+
+  table {
+    width: 100%;
+    margin-top: 25px;
+    border-collapse: collapse;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  }
+
+  th, td {
+    padding: 14px;
+    text-align: center;
+    border: 1px solid #cceeff;
+    font-size: 16px;
+  }
+
+  th {
+    background-color: #00bcd4;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .interpretation-table {
+    width: 80%;
+    margin: 40px auto;
+  }
+
+  .blog-note {
+    font-style: italic;
+    color: #666;
+    text-align: center;
+    margin-top: 12px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .blog-container {
+      padding: 30px;
+    }
+
+    .interpretation-table {
+      width: 100%;
+    }
+
+    .blog-section {
+      padding: 20px;
+    }
+  }
+</style>
+
+<div class="blog-container">
+  <h1> 🧠 Understanding Tuberculous Meningitis (TBM)</h1>
+
+  <div class="blog-section">
+    <h2>🧠 What Is Tuberculous Meningitis (TBM)?</h2>
+    <p>TBM is a life-threatening infection of the protective membranes around the brain and spinal cord (meninges), caused by <strong>Mycobacterium tuberculosis</strong>. It is the most severe form of extrapulmonary TB.</p>
+  </div>
+
+  <div class="blog-section">
+    <h2>🔍 How Does TBM Develop?</h2>
+    <p>TB bacteria can travel from the lungs to the brain through the bloodstream, causing inflammation and swelling of the meninges, which may lead to brain damage or death if untreated.</p>
+  </div>
+
+  <div class="blog-section">
+    <h2>⚠ Symptoms to Watch For</h2>
+    <ul>
+      <li>Persistent headache</li>
+      <li>Fever</li>
+      <li>Nausea and vomiting</li>
+      <li>Stiff neck</li>
+      <li>Confusion or altered mental state</li>
+      <li>Seizures</li>
+      <li>Coma (in severe cases)</li>
+      <li>In children: irritability, lethargy, poor feeding</li>
+    </ul>
+  </div>
+
+  <div class="blog-section">
+    <h2>🧠 Why Early Detection Matters</h2>
+    <p>Complications of untreated TBM include brain damage, hydrocephalus, stroke, and death. Timely diagnosis is crucial to prevent lasting harm.</p>
+  </div>
+
+  <div class="blog-section">
+    <h2>🧪 How Our Platform Helps</h2>
+    <div class="highlight-box">
+      Our AI-powered TBM classifier analyzes lab data to flag TBM risk early, giving doctors an edge in diagnosis. It doesn't replace clinical decisions but enhances them with data-driven insights.
+    </div>
+  </div>
+
+  <div class="blog-section">
+    <h2>🧠 TBM Classifier Scoring System</h2>
+    <p>This scoring system evaluates key CSF parameters and provides a TBM risk score out of 10, guiding clinical interpretation.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Sr. No.</th>
+          <th>Parameter</th>
+          <th>Criteria</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>Total Leukocyte Count (TLC)</td><td>˃ 75 cells/cumm</td><td>2.5</td></tr>
+        <tr><td>2</td><td>DLC (Lymphocytes %)</td><td>80% to 85% lymphocytes</td><td>2.5</td></tr>
+        <tr><td>3</td><td>Sugar</td><td>15 to 48 mg/dL</td><td>2.5</td></tr>
+        <tr><td>4</td><td>Protein</td><td>75 to 200 mg/dL</td><td>2.5</td></tr>
+      </tbody>
+    </table>
+    <p class="blog-note">Note: TLC and DLC must both meet criteria to earn the combined score of 5.</p>
+  </div>
+
+  <div class="blog-section">
+    <h2>📊 Interpretation Guide</h2>
+    <table class="interpretation-table">
+      <thead>
+        <tr><th>Total Score</th><th>Interpretation</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>0</td><td>No TBM – Kindly correlate clinically</td></tr>
+        <tr><td>2.5</td><td>Kindly correlate clinically</td></tr>
+        <tr><td>5</td><td>Possible TBM</td></tr>
+        <tr><td>7.5</td><td>Probable TBM</td></tr>
+        <tr><td>10</td><td>Definite TBM</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="blog-section">
+    <h2>🛠 Features of Our Tool</h2>
+    <ul>
+      <li>✅ Accepts manual or CSV CSF input</li>
+      <li>✅ Calculates TBM score instantly</li>
+      <li>✅ Suggests interpretation based on score</li>
+      <li>✅ Encourages clinical correlation always</li>
+    </ul>
+  </div>
+
+  <div class="blog-section">
+    <h2>📌 Why This Matters</h2>
+    <p>TBM is rare but deadly. Our tool helps clinicians detect it early and improve outcomes — especially when symptoms mimic other diseases.</p>
+  </div>
+</div>
+
+{% endblock %}

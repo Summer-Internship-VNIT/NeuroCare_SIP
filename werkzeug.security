@@ -1,0 +1,8 @@
+from werkzeug.security import generate_password_hash, check_password_hash
+
+# Encrypt when saving:
+hashed = generate_password_hash(password)
+
+# Check on login:
+if check_password_hash(hashed_from_file, entered_password):
+    # Success

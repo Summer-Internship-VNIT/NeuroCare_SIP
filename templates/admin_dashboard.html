@@ -1,0 +1,185 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<style>
+  /* Container */
+  .admin-dashboard-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 30px 40px;
+    border-radius: 15px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  /* Heading */
+  .admin-dashboard-container h2 {
+    text-align: center;
+    color: #1c4450;
+    font-weight: 700;
+    margin-bottom: 25px;
+    font-size: 2.4rem;
+  }
+
+  /* Search bar container */
+  .search-bar {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 25px;
+  }
+
+  /* Search input */
+  #searchInput {
+    width: 100%;
+    max-width: 450px;
+    padding: 12px 18px;
+    border-radius: 30px;
+    border: 2px solid #1c4450;
+    font-size: 1rem;
+    color: #1c4450;
+    outline: none;
+    box-shadow: inset 2px 2px 6px #d6e6ea;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  #searchInput::placeholder {
+    color: #8ca7b3;
+    font-style: italic;
+  }
+
+  #searchInput:focus {
+    border-color: #36a2eb;
+    box-shadow: 0 0 8px #36a2eb;
+  }
+
+  /* Table container for horizontal scroll */
+  .table-container {
+    overflow-x: auto;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgb(0 0 0 / 0.05);
+  }
+
+  /* Table styles */
+  #adminTable {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+    font-size: 1rem;
+    color: #333;
+    box-shadow: 0 0 15px rgb(0 0 0 / 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  /* Table header */
+  #adminTable thead tr {
+    background-color: #1c4450;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  #adminTable thead th {
+    padding: 14px 20px;
+    text-align: left;
+    font-weight: 600;
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  /* Table body rows */
+  #adminTable tbody tr {
+    background-color: #f9fdfd;
+    border-bottom: 1px solid #e2f0f7;
+    transition: background-color 0.25s ease;
+    cursor: default;
+  }
+
+  #adminTable tbody tr:nth-child(even) {
+    background-color: #e9f2f5;
+  }
+
+  /* Hover effect on rows */
+  #adminTable tbody tr:hover {
+    background-color: #d0e6f0;
+  }
+
+  /* Table data cells */
+  #adminTable tbody td {
+    padding: 12px 20px;
+    white-space: nowrap;
+    border-right: 1px solid #e2f0f7;
+  }
+
+  /* Remove border on last td */
+  #adminTable tbody td:last-child {
+    border-right: none;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .admin-dashboard-container {
+      padding: 20px;
+      margin: 20px 15px;
+    }
+
+    #adminTable {
+      font-size: 0.9rem;
+      min-width: 100%;
+    }
+
+    #searchInput {
+      max-width: 100%;
+    }
+  }
+</style>
+
+<div class="admin-dashboard-container">
+  <h2>Patient Records</h2>
+
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Search by ID, Name, Sample Code, or Condition (Normal/Abnormal)...">
+  </div>
+
+  <div class="table-container">
+    <table id="adminTable">
+      <thead>
+        <tr>
+          {% for col in data[0].keys() %}
+            <th>{{ col }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in data %}
+          <tr>
+            {% for val in row.values() %}
+              <td>{{ val }}</td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Search filter script -->
+<script>
+  document.getElementById("searchInput").addEventListener("input", function () {
+    const value = this.value.toLowerCase().trim();
+    const searchTerms = value.split(/\s+/);  // Split by spaces
+    const rows = document.querySelectorAll("#adminTable tbody tr");
+
+    rows.forEach(row => {
+      const rowText = row.textContent.toLowerCase();
+      const words = rowText.split(/\s+/);
+      const matches = searchTerms.every(term =>
+        words.some(word => word === term)
+      );
+      row.style.display = matches ? "" : "none";
+    });
+  });
+</script>
+
+{% endblock %}

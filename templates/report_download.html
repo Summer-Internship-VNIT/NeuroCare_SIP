@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Patient Report</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 40px;
+    }
+
+    .report-container {
+      padding: 20px;
+      border: 1px solid #ccc;
+    }
+
+    h2 {
+      text-align: center;
+      color: #007bff;
+    }
+
+    .report-card p {
+      font-size: 16px;
+      margin: 10px 0;
+    }
+
+    .highlight-box {
+      margin-top: 20px;
+      padding: 15px;
+      background: #fff4e5;
+      border-left: 6px solid #ffa500;
+    }
+
+    .highlight-box.green {
+      background-color: #e0f7ea;
+      border-left-color: green;
+    }
+
+    .highlight-box h4 {
+      margin: 0 0 10px 0;
+      font-size: 17px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+<div class="report-container">
+  <h2>Patient Report</h2>
+
+  <div class="report-card">
+    <p><strong>Patient ID:</strong> {{ record['Patient_ID'] }}</p>
+    <p><strong>Date:</strong> {{ record['Date'] }}</p>
+    <p><strong>Sample Code:</strong> {{ record['Sample Code'] }}</p>
+    <p><strong>TLC:</strong> {{ record['TLC'] }}</p>
+    <p><strong>Lymphocytes (L%):</strong> {{ record['L%'] }}</p>
+    <p><strong>Polymorphs (P%):</strong> {{ record['P%'] }}</p>
+    <p><strong>Sugar:</strong> {{ record['Sugar'] }}</p>
+    <p><strong>Protein:</strong> {{ record['Protein'] }}</p>
+    <p><strong>Diagnosis:</strong>
+      <span style="color: '{% if record['Diagnosis'] == 'Abnormal' %}red{% else %}green{% endif %}';">
+        {{ record['Diagnosis'] }}
+      </span>
+    </p>
+    <p><strong>TBM Score:</strong> {{ record['TBM Score'] }}</p>
+  </div>
+
+  {% if record['Diagnosis'] == 'Abnormal' %}
+    <div class="highlight-box">
+      <h4>🧠 Clinical Interpretation Based on TBM Score:</h4>
+      <p>
+        {% if record['TBM Score'] == 0 %}
+          Abnormal report, but TBM score is 0. No signs of TBM based on lab values. Correlate clinically.
+        {% elif record['TBM Score'] == 2.5 %}
+          TBM score of 2.5 suggests mild changes. Clinical observation advised.
+        {% elif record['TBM Score'] == 5 %}
+          Score 5 indicates possible TBM. Recommend further investigation.
+        {% elif record['TBM Score'] == 7.5 %}
+          Score 7.5 suggests probable TBM. Immediate medical attention recommended.
+        {% elif record['TBM Score'] == 10 %}
+          Score 10 → High likelihood of TBM. Start clinical management immediately.
+        {% else %}
+          Score unclear. Seek clinical correlation.
+        {% endif %}
+      </p>
+    </div>
+  {% else %}
+    <div class="highlight-box green">
+      <h4>🟢 Diagnosis: Normal</h4>
+      <p>No evidence of TBM. Continue regular clinical observation.</p>
+    </div>
+  {% endif %}
+</div>
+
+</body>
+</html>
