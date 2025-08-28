@@ -1,0 +1,162 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: #9cc4d0;
+  }
+
+  .page-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .signup-wrapper {
+    display: flex;
+    width: 900px;
+    max-width: 100%;
+    height: auto;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  }
+
+  .signup-left {
+    background: linear-gradient(to bottom right, #18414e, #9cc4d0);
+    color: white;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+  }
+
+  .signup-left h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+  }
+
+  .signup-left p {
+    font-size: 16px;
+    text-align: center;
+    max-width: 250px;
+  }
+
+  .signup-right {
+    flex: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .signup-right h2 {
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  .signup-right input,
+  .signup-right select {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+  }
+
+  .signup-right button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background-color: #516d75;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .signup-right button:hover {
+    background-color: #18414e;
+  }
+
+  .error {
+    color: red;
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  .success {
+    color: green;
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  .create-account {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+  }
+
+  .create-account a {
+    color: #18414e;
+    text-decoration: none;
+  }
+
+  @media (max-width: 768px) {
+    .signup-wrapper {
+      flex-direction: column;
+      height: auto;
+    }
+
+    .signup-left, .signup-right {
+      flex: none;
+      width: 100%;
+      padding: 20px;
+    }
+  }
+</style>
+
+<div class="page-container">
+  <div class="signup-wrapper">
+    <div class="signup-left">
+      <h1>Hello!</h1>
+      <p>Create your account to get started with us.</p>
+    </div>
+    <div class="signup-right">
+      <h2>Sign Up</h2>
+      <form method="POST">
+        <input type="text" name="username" id="username" placeholder="Enter username" required>
+        <input type="password" name="password" id="password" placeholder="Create password" required>
+        <select name="role" id="role" required>
+          <option value="Client">Operator</option>
+          <option value="Admin">Admin</option>
+        </select>
+        <input type="text" name="patient_id" id="patient_id" placeholder="Patient ID (optional for Admins)">
+        <button type="submit">Sign Up</button>
+      </form>
+      {% if error %}
+        <p class="error">{{ error }}</p>
+      {% endif %}
+      {% if success %}
+        <p class="success">{{ success }}</p>
+      {% endif %}
+
+      <div class="create-account">
+        Already have an account? <a href="{{ url_for('login') }}">Log in</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,294 @@
+{% extends 'layout.html' %}
+  {% block content %}
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <div class="dashboard">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="profile">
+        <div class="avatar">
+          <img src="{{ url_for('static', filename='images/dp.png') }}" alt="Profile Picture">
+        </div>
+        <h2>Patient</h2>
+        <!-- <p>{{ data[0]['Patient_ID'] if data }}</p> -->
+      </div>
+      <div class="nav-menu">
+        <ul>
+          <li><a href="{{ url_for('home') }}">Home</a></li>
+          <li><a href="{{ url_for('data_entry') }}">Data Entry</a></li>
+          <li><a href="{{ url_for('report') }}">Report</a></li>
+          <li><a href="{{ url_for('login') }}">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+
+<style>
+  .header h1 {
+  font-size: 32px; /* Increase this value as needed */
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+  .line-chart {
+    height: calc(100% + 1mm);
+  }
+  #sugarProteinChart {
+    height: 100% !important;
+  }
+
+.calendar {
+  height: 330px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* vertical center */
+  align-items: center;     /* horizontal center */
+  text-align: center;
+  padding: 20px 10px;
+  box-sizing: border-box;
+}
+
+.calendar-icon {
+  height: 120px;
+  width: auto;
+  object-fit: contain;
+  margin-bottom: 20px; /* Reduced gap between icon and date */
+}
+
+.calendar h3 {
+  margin-top: 0;
+  font-weight: 600;
+}
+
+
+</style>
+
+    <div class="main-content">
+      {% if data|length > 0 %}
+      <div class="header">
+        <h1>Patient Dashboard</h1>
+      </div>
+
+      <div class="cards">
+        <div class="card">TLC <span>{{ data[-1]['TLC'] }}</span></div>
+        <div class="card">Lymphocytes% <span>{{ data[-1]['L%'] }}%</span></div>
+        <div class="card">Polymorphs% <span>{{ data[-1]['P%'] }}%</span></div>
+        <div class="card">Sugar <span>{{ data[-1]['Sugar'] }} mg/dL</span></div>
+        <div class="card">Protein <span>{{ data[-1]['Protein'] }} mg/dL</span></div>
+      </div>
+
+      <div class="cards">
+        <div class="card">Diagnosis <span class="highlight-span">{{ diagnosis_label }}</span></div>
+        <div class="card">TBM Score <span class="highlight-span">{{ model_output_percentage }}</span></div>
+        <div class="card">Interpretation <span class="highlight-span">{{ diagnosis_message }}</span></div>
+      </div>
+
+      <div class="charts">
+        <div class="bar-chart">
+          <h3>TLC Over Time</h3>
+          <canvas id="trendChart"></canvas>
+        </div>
+        <div class="pie-chart">
+          <h3>CSF Cell Composition</h3>
+          <canvas id="lpPieChart"></canvas>
+        </div>
+      </div>
+
+      <div class="bottom-charts">
+        <div class="line-chart">
+          <h3>Sugar & Protein Over Time</h3>
+          <canvas id="sugarProteinChart"></canvas>
+      </div>
+      <div class="calendar">
+        <img src="{{ url_for('static', filename='images/calendar.png') }}" 
+            alt="Calendar Icon" class="calendar-icon">
+        <h3>Latest Test: {{ data[-1]['Date'] }}</h3>
+        
+      </div>
+
+
+      </div>
+
+      <div class="table-card">
+        <h2>Historical Records</h2>
+        <input type="text" id="searchInput" placeholder="Search by Sample Code...">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Sample Code</th>
+                <th>TLC</th>
+                <th>L%</th>
+                <th>P%</th>
+                <th>Sugar</th>
+                <th>Protein</th>
+                <th>Diagnosis</th>
+              </tr>
+            </thead>
+            <tbody id="historyTable">
+              {% for row in data %}
+              <tr>
+                <td>{{ row['Date'] }}</td>
+                <td>{{ row['Sample Code'] }}</td>
+                <td>{{ row['TLC'] }}</td>
+                <td>{{ row['L%'] }}</td>
+                <td>{{ row['P%'] }}</td>
+                <td>{{ row['Sugar'] }}</td>
+                <td>{{ row['Protein'] }}</td>
+                <td>{{ 'TBM' if row['Diagnosis'] == 'Abnormal' else row['Diagnosis'] }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
+    <!-- Report Section -->
+<div style="text-align: center; margin-top: 30px;">
+  <a href="{{ url_for('report') }}"
+     style="padding: 10px 20px; background-color: #1c4450; color: white; text-decoration: none; border-radius: 5px;">
+    View Full Report
+  </a>
+</div>
+
+
+      {% else %}
+      <div class="card">
+        <h3>Welcome!</h3>
+        <p>No CSF records found yet.</p>
+        <p>Please <a href="{{ url_for('data_entry') }}">enter lab data</a> to see your dashboard.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+<script>
+window.addEventListener('DOMContentLoaded', function () {
+  const chartData = {{ data | tojson | safe }};
+
+  // ✅ Helper to format date (e.g., "24 Jun")
+  function formatDate(dateStr) {
+    const d = new Date(dateStr);
+    return isNaN(d) ? dateStr : d.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short"
+    });
+  }
+
+  // ────────── TLC Trend Line Chart ──────────
+  const tlcLabels = chartData.map(row => formatDate(row['Date']));
+  const tlcValues = chartData.map(row => row['TLC']);
+
+  new Chart(document.getElementById("trendChart"), {
+    type: "line",
+    data: {
+      labels: tlcLabels,
+      datasets: [{
+        label: "TLC",
+        data: tlcValues,
+        borderColor: "blue",
+        backgroundColor: "rgba(0, 0, 255, 0.1)",
+        fill: true,
+        tension: 0.3
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: { display: true, text: 'TLC Trend' },
+        legend: { display: true, position: 'top' }
+      },
+      scales: {
+        y: { beginAtZero: true, title: { display: true, text: 'TLC' } },
+        x: { title: { display: true, text: 'Date' } }
+      }
+    }
+  });
+
+  // ────────── CSF Cell Composition Pie Chart ──────────
+  const lymph = chartData.at(-1)["L%"];
+  const polymorphs = chartData.at(-1)["P%"];
+
+  new Chart(document.getElementById("lpPieChart"), {
+    type: "pie",
+    data: {
+      labels: ["Lymphocytes (L%)", "Polymorphs (P%)"],
+      datasets: [{
+        data: [lymph, polymorphs],
+        backgroundColor: ["#36A2EB", "#FF6384"],
+        hoverOffset: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: { display: true, text: 'CSF Cell Composition' },
+        legend: { display: true, position: 'bottom' }
+      }
+    }
+  });
+
+  // ────────── Sugar & Protein Line Chart ──────────
+  const sugarProteinLabels = chartData.map(r => formatDate(r['Date']));
+  const sugarData = chartData.map(r => r['Sugar']);
+  const proteinData = chartData.map(r => r['Protein']);
+
+  new Chart(document.getElementById('sugarProteinChart'), {
+    type: 'line',
+    data: {
+      labels: sugarProteinLabels,
+      datasets: [
+        {
+          label: 'Sugar',
+          data: sugarData,
+          borderColor: '#f39c12',
+          backgroundColor: 'rgba(243, 156, 18, 0.2)',
+          fill: true,
+          tension: 0.3
+        },
+        {
+          label: 'Protein',
+          data: proteinData,
+          borderColor: '#8e44ad',
+          backgroundColor: 'rgba(142, 68, 173, 0.2)',
+          fill: true,
+          tension: 0.3
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: { display: true, text: 'Sugar & Protein Trend' },
+        legend: { position: 'top' }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: { display: true, text: 'mg/dL' }
+        },
+        x: {
+          title: { display: true, text: 'Date' }
+        }
+      }
+    }
+  });
+
+  // ────────── Search Filter for Table ──────────
+  document.getElementById("searchInput").addEventListener("input", function () {
+    const value = this.value.toLowerCase();
+    document.querySelectorAll("#historyTable tr").forEach(row => {
+      const sampleCode = row.children[1].textContent.toLowerCase();
+      row.style.display = sampleCode.includes(value) ? "" : "none";
+    });
+  });
+});
+</script>
+
+
+
+  {% endblock %}
